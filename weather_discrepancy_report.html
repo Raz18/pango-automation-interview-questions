@@ -1,0 +1,235 @@
+
+        <html>
+        <head>
+            <title>Weather Data Analysis Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+                h1, h2 { color: #2E4053; border-bottom: 2px solid #aed6f1; padding-bottom: 5px;}
+                .container { max-width: 900px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: white; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);}
+                table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+                th { background-color: #f2f2f2; font-weight: bold; }
+                tr:hover { background-color: #f5f5f5; }
+                .stats-table td:first-child { font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Weather Data Analysis Report</h1>
+
+                <h2>Summary Statistics</h2>
+                <table border="1" class="dataframe stats-table">
+  <tbody>
+    <tr>
+      <th>Mean Discrepancy</th>
+      <td>1.39 °C</td>
+    </tr>
+    <tr>
+      <th>Maximum Discrepancy</th>
+      <td>10.04 °C</td>
+    </tr>
+    <tr>
+      <th>Minimum Discrepancy</th>
+      <td>0.03 °C</td>
+    </tr>
+  </tbody>
+</table>
+
+                <h2>Temperature Discrepancies (Threshold > 3.0°C)</h2>
+                <table border="1" class="dataframe discrepancy-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>city</th>
+      <th>temperature_web</th>
+      <th>temperature_api</th>
+      <th>discrepancy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>tehran</td>
+      <td>26.00</td>
+      <td>36.04</td>
+      <td>10.04</td>
+    </tr>
+    <tr>
+      <td>beijing</td>
+      <td>26.00</td>
+      <td>22.94</td>
+      <td>3.06</td>
+    </tr>
+  </tbody>
+</table>
+
+                <h2>Full Data Log</h2>
+                <table border="1" class="dataframe full-data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>city</th>
+      <th>temperature_web</th>
+      <th>feels_like_web</th>
+      <th>temperature_api</th>
+      <th>feels_like_api</th>
+      <th>avg_temperature</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>tel aviv</td>
+      <td>26.0</td>
+      <td>27.0</td>
+      <td>26.07</td>
+      <td>26.07</td>
+      <td>26.04</td>
+    </tr>
+    <tr>
+      <td>haifa</td>
+      <td>26.0</td>
+      <td>27.0</td>
+      <td>25.52</td>
+      <td>26.03</td>
+      <td>25.76</td>
+    </tr>
+    <tr>
+      <td>london</td>
+      <td>23.0</td>
+      <td>25.0</td>
+      <td>22.73</td>
+      <td>22.60</td>
+      <td>22.86</td>
+    </tr>
+    <tr>
+      <td>new york</td>
+      <td>26.0</td>
+      <td>27.0</td>
+      <td>27.00</td>
+      <td>29.02</td>
+      <td>26.50</td>
+    </tr>
+    <tr>
+      <td>tokyo</td>
+      <td>27.0</td>
+      <td>29.0</td>
+      <td>26.38</td>
+      <td>26.38</td>
+      <td>26.69</td>
+    </tr>
+    <tr>
+      <td>sydney</td>
+      <td>9.0</td>
+      <td>7.0</td>
+      <td>8.97</td>
+      <td>6.94</td>
+      <td>8.98</td>
+    </tr>
+    <tr>
+      <td>rome</td>
+      <td>30.0</td>
+      <td>31.0</td>
+      <td>31.80</td>
+      <td>37.21</td>
+      <td>30.90</td>
+    </tr>
+    <tr>
+      <td>berlin</td>
+      <td>33.0</td>
+      <td>31.0</td>
+      <td>31.86</td>
+      <td>30.45</td>
+      <td>32.43</td>
+    </tr>
+    <tr>
+      <td>madrid</td>
+      <td>35.0</td>
+      <td>33.0</td>
+      <td>35.33</td>
+      <td>33.55</td>
+      <td>35.16</td>
+    </tr>
+    <tr>
+      <td>barcelona</td>
+      <td>27.0</td>
+      <td>30.0</td>
+      <td>29.36</td>
+      <td>29.63</td>
+      <td>28.18</td>
+    </tr>
+    <tr>
+      <td>tehran</td>
+      <td>26.0</td>
+      <td>27.0</td>
+      <td>36.04</td>
+      <td>33.19</td>
+      <td>31.02</td>
+    </tr>
+    <tr>
+      <td>istanbul</td>
+      <td>23.0</td>
+      <td>25.0</td>
+      <td>22.31</td>
+      <td>21.80</td>
+      <td>22.66</td>
+    </tr>
+    <tr>
+      <td>cairo</td>
+      <td>32.0</td>
+      <td>31.0</td>
+      <td>32.42</td>
+      <td>31.18</td>
+      <td>32.21</td>
+    </tr>
+    <tr>
+      <td>moscow</td>
+      <td>15.0</td>
+      <td>15.0</td>
+      <td>14.26</td>
+      <td>13.15</td>
+      <td>14.63</td>
+    </tr>
+    <tr>
+      <td>beijing</td>
+      <td>26.0</td>
+      <td>27.0</td>
+      <td>22.94</td>
+      <td>22.83</td>
+      <td>24.47</td>
+    </tr>
+    <tr>
+      <td>seoul</td>
+      <td>19.0</td>
+      <td>19.0</td>
+      <td>18.76</td>
+      <td>19.30</td>
+      <td>18.88</td>
+    </tr>
+    <tr>
+      <td>bangkok</td>
+      <td>28.0</td>
+      <td>31.0</td>
+      <td>27.91</td>
+      <td>31.73</td>
+      <td>27.96</td>
+    </tr>
+    <tr>
+      <td>delhi</td>
+      <td>32.0</td>
+      <td>41.0</td>
+      <td>30.05</td>
+      <td>37.05</td>
+      <td>31.02</td>
+    </tr>
+    <tr>
+      <td>mumbai</td>
+      <td>30.0</td>
+      <td>37.0</td>
+      <td>28.99</td>
+      <td>34.50</td>
+      <td>29.49</td>
+    </tr>
+  </tbody>
+</table>
+
+            </div>
+        </body>
+        </html>
+        

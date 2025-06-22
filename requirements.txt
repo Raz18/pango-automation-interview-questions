@@ -1,0 +1,15 @@
+playwright~=1.52.0
+requests
+pandas
+pytest
+pytest-html
+pytest-asyncio
+pytest-mock
+pytest-benchmark
+pytest-xdist
+pytest-cov
+selenium
+beautifulsoup4
+lxml
+python-dotenv
+pytest-timeout
