@@ -8,8 +8,6 @@ pytest-mock
 pytest-benchmark
 pytest-xdist
 pytest-cov
-selenium
-beautifulsoup4
 lxml
 python-dotenv
 pytest-timeout
