@@ -2,90 +2,212 @@
 
 ## Overview
 
-The goal of this task is to **extend the existing project** by designing and implementing a module that tests and analyzes temperature data. This module should compare real-time readings from a public website and a weather API, store and process the data, and generate a discrepancy report.
+The goal of this task is to extend the existing project by designing and implementing a module that tests and analyzes temperature data. This module should compare real-time readings from a public website and a weather API, store and process the data, and generate a discrepancy report.
 
-> ⚠️ **Important**: This work must be use fork from this **existing project**.
+## Technical Implementation and Highlights
 
----
+This project is a Python-based application designed to collect, store, and analyze weather data from two different sources: a public website and a weather API. It then generates a comprehensive HTML report highlighting discrepancies and providing summary statistics.
 
-## Test Case: City Temperature Discrepancy Analysis
+### Key Features:
 
-### 1. City Selection
+**Asynchronous Data Collection**: The application uses asyncio and playwright for asynchronous web scraping, allowing for efficient and parallel data collection from timeanddate.com for multiple cities.
 
-- Select **20 random cities** for the analysis. (Cities names could be hardcoded)
+**Weather API Integration**: It fetches weather data from the OpenWeatherMap API, providing a secondary source for temperature and "feels like" data.
 
-### 2. Data Sources
+**Database Storage**: The collected data is stored in a SQLite database, with a table to hold the weather information from both the web and API sources, along with a computed average temperature.
 
-- **Website**  
-  Scrape current `temperature` and `feels like` values from [timeanddate.com](https://www.timeanddate.com/weather/).
+**Configuration File**: The application uses a config.ini file to manage the API key and database name, allowing for easy customization without modifying the source code.
 
-- **API**  
-  Use the OpenWeatherMap API to fetch current weather data:  https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+**Comprehensive Reporting**: A detailed HTML report is generated.
 
-### 3. Data Extraction
+**Centralized Logging**: The application uses a standardized logging setup to output information to both the console and a log file.
 
-- **Web Scraping**  
-Use Selenium or Playwright to extract:
-- `temperature_web`
-- `feels_like_web`
+**Robust Testing Framework**: The project includes a comprehensive test suite using pytest, with different types of tests.
 
-- **API Call**  
-Extract the following fields from the JSON response:
-- `temperature_api`
-- `feels_like_api`
+## Deeper Technical Dive
 
-### 4. Database Integration
+### Main Asynchronous Orchestrator (main.py)
 
-- You are **free to define your own database but use this schema**.
-- For each city, store:
-- `temperature_web`
-- `feels_like_web`
-- `temperature_api`
-- `feels_like_api`
-- Add a computed column:
-- `avg_temperature` — the average of the web and API temperature values.
+The core of the application's execution is managed by the `async def main()` function in main.py. This function acts as the central orchestrator for the entire data processing pipeline.
 
-### 5. Reporting
+**Workflow:**
 
-After data collection, generate a report. You may choose between:
-- A **single combined report**, or
-- **Two separate reports** (e.g., one for discrepancies and one for statistics)
+1. **Initialization**: It starts by initializing the logger, the database (creating the table if it doesn't exist), and creating instances of the helper classes (WebScraper, ApiHelper, DBHelper, DataAnalyzer, ReportGenerator).
 
-**Format**:  
-- Free choice (CSV, HTML, JSON, Markdown, etc.)
+2. **Concurrent Data Fetching**: The highlight of the orchestration is the use of `asyncio.gather()`. This allows the application to fetch data from the website and the weather API concurrently, significantly speeding up the data collection phase.
 
-**Contents**:
-- Cities where the **difference between website and API temperatures exceeds a configurable threshold**
-- **Summary statistics**:
-- Mean discrepancy
-- Maximum discrepancy
-- Minimum discrepancy
+```python
+# from main.py
+web_data, api_data = await asyncio.gather(
+    scraper.get_weather_for_cities_from_web(CITIES),
+    api_helper.get_weather_for_cities_from_api(CITIES)
+)
+```
 
----
+3. **Data Analysis & Storage**: Once the data is collected, it is passed to the DataAnalyzer to calculate temperature differences and averages.
 
-## Test Automation Framework
+4. **Database Insertion**: The enriched data is then handed off to the DBHelper to be inserted into the SQLite database.
 
-Your solution must include an **automated test framework** that covers:
+5. **Report Generation**: Finally, all data is retrieved from the database and used by the ReportGenerator to create the final HTML report.
 
-- **End-to-end tests** for the full pipeline (data collection → DB → report)
+### Database Helper (utilities/db_helpers.py)
 
-Use a standard Python testing framework. Ensure tests can be easily executed with clear instructions.
+The DBHelper class abstracts all database interactions, ensuring a clean separation of concerns. It uses Python's built-in sqlite3 module.
 
----
+**Key Functions:**
 
-## Submission Guidelines
+- `create_connection()`: Establishes a connection to the SQLite database file specified in config.ini.
+- `create_table()`: Executes a CREATE TABLE IF NOT EXISTS SQL statement to ensure the weather_data table is available.
+- `insert_weather_data(data)`: Takes a list of data rows and inserts them into the weather_data table using executemany for efficient bulk insertion.
+- `get_all_weather_data()`: Fetches all records from the database and returns them as a list of dictionaries for easy processing and report generation.
 
-1. Push the following to the ** GitHub repository**:
- - Source code
- - Configuration files
- - Test scripts
- - Generated report(s)
+### Asynchronous Web Scraping (utilities/web_scraper.py)
 
-2. Include a README that provides:
- - Setup instructions
- - How to run the project and the tests
- - How to view and interpret the report(s)
+The WebScraper utilizes playwright's async API to scrape temperatures from timeanddate.com.
 
----
+`async def get_weather_for_cities_from_web(cities)`: This function iterates through a list of cities, creating an asynchronous task for each city using `asyncio.create_task`. This enables parallel scraping of multiple city pages, drastically reducing total execution time compared to a sequential approach.
 
-Good luck, and make sure your code is clean, well-documented, and testable!
+### Asynchronous API Calls (utilities/api_helpers.py)
+
+Similarly, the ApiHelper uses aiohttp to make non-blocking HTTP requests to the OpenWeatherMap API.
+
+`async def get_weather_for_cities_from_api(cities)`: This function also leverages `asyncio.gather` to make concurrent API calls for all cities, efficiently fetching the data.
+
+### Logging Implementation (helpers/logger.py)
+
+The project uses Python's standard logging module for robust logging. The configuration is handled by the `setup_logger` function in helpers/logger.py.
+
+**Centralized Setup**: This function creates and configures a logger that is used consistently across the entire application.
+
+**Dual Output**: The logger is configured to output to two destinations:
+- **Console**: StreamHandler prints log messages directly to the console in real-time.
+- **File**: FileHandler writes log messages to a file for later inspection and debugging.
+
+**Log File Location**: Application logs are stored in the `logs/app.log` file. The logger automatically creates the logs directory if it does not exist.
+
+**Usage**: In any module, the logger is initialized with `logger = setup_logger()`, ensuring all parts of the application use the same logging configuration.
+
+## Configuration
+
+You can customize the application's parameters by editing the `config/config.ini` file:
+
+```ini
+[API]
+API_KEY = your_api_key_here
+[DB]
+DB_NAME = data.db
+```
+
+- **API_KEY**: Your API key for the OpenWeatherMap API.
+- **DB_NAME**: The name of the SQLite database file.
+
+### Temperature Discrepancy Threshold
+
+The threshold for highlighting temperature discrepancies in the report can be adjusted in the main.py file by modifying the threshold parameter in the `generate_html_report` function call:
+
+```python
+report_gen.generate_html_report(threshold=3.0)
+```
+
+## Setup Instructions
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/raz18/pango-automation-interview-questions.git
+   cd pango-automation-interview-questions
+   ```
+
+2. **Create a virtual environment (recommended):**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   ```
+
+3. **Install the required dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Install Playwright browsers:**
+   ```bash
+   playwright install
+   ```
+
+## How to Run the Project and Tests
+
+### Running the Application
+
+To run the entire data collection and report generation process, execute the main.py script:
+
+```bash
+python main.py
+```
+
+This will:
+- Fetch weather data for the predefined list of cities.
+- Store the data in the SQLite database.
+- Generate the HTML report and log files.
+
+### Running the Tests
+
+To run the entire test suite, use pytest:
+
+```bash
+pytest
+```
+
+**Note**: Due to the robustness of the tests, particularly the end-to-end and performance suites which involve browser interactions and API calls, a full test cycle can take up to 5 minutes to complete.
+
+You can also run specific categories of tests using markers.
+
+### Pytest Configuration (pytest.ini)
+
+The pytest.ini file is used to configure pytest and define custom markers for categorizing tests. This allows for running specific subsets of the test suite.
+
+**Available Markers:**
+
+- **unit**: Marks tests as unit tests.
+  ```bash
+  pytest -m unit
+  ```
+
+- **integration**: Marks tests as integration tests.
+  ```bash
+  pytest -m integration
+  ```
+
+- **e2e**: Marks tests as end-to-end tests.
+  ```bash
+  pytest -m e2e
+  ```
+
+- **performance**: Marks tests as performance tests.
+  ```bash
+  pytest -m performance
+  ```
+
+## Execution Artifacts and Reports
+
+After running the application or the tests, the following artifacts will be generated:
+
+### HTML Report: `weather_discrepancy_report.html`
+- **Location**: Project root directory.
+- **Description**: This is the main output of the application, containing the summary statistics and data logs.
+
+### Application Log: `logs/app.log`
+- **Location**: In the logs directory.
+- **Description**: Contains detailed, timestamped logs of the main application's execution, including data fetching, analysis, and report generation steps.
+
+### Test Log: `temp/pytest.log`
+- **Location**: In the temp directory.
+- **Description**: Contains the output from running the pytest test suite. The location is configured in pytest.ini.
+
+## How to View and Interpret the HTML Report
+
+Open the generated `weather_discrepancy_report.html` file in your web browser. The report is divided into three sections:
+
+1. **Summary Statistics**: This section provides a quick overview of the temperature discrepancies found in the collected data, including the mean, maximum, and minimum differences.
+
+2. **Temperature Discrepancies**: This table lists the cities where the absolute difference between the website and API temperatures exceeds the configured threshold. This helps to quickly identify significant data inconsistencies.
+
+3. **Full Data Log**: This section contains a complete table of all the data collected, including the temperatures from both the web and API, the "feels like" values, and the calculated average temperature for each city.
