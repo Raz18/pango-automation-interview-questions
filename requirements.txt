@@ -9,5 +9,4 @@ pytest-benchmark
 pytest-xdist
 pytest-cov
 lxml
-python-dotenv
 pytest-timeout
